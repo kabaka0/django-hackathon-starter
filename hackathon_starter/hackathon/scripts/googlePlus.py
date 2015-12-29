@@ -1,5 +1,5 @@
 import requests
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import simplejson as json
 import random
 import string
@@ -58,7 +58,7 @@ class GooglePlus:
 		                'client_id':self.client_id,
 		                'scope': PROFILE_API}
 
-		params = urllib.urlencode(authSettings)
+		params = urllib.parse.urlencode(authSettings)
 		return AUTHORISE_URL + '?' + params
 
 
@@ -76,7 +76,7 @@ class GooglePlus:
 
 		#Checking that the sessino ID from the response match the session ID we sent
 		if state != self.session_id:
-			raise(Exception('Danger! Someone is messing up with you connection!'))
+			raise Exception
 
 		authSettings = {'client_secret': self.client_secret,
 		                'code':code,
@@ -86,7 +86,7 @@ class GooglePlus:
 
 		response = requests.post(ACCESS_TOKEN_URL, data=authSettings)
 		if response.status_code != 200:
-			raise(Exception('Invalid response, response code {c}'.format(c=response.status_code)))
+			raise Exception
 
 		self.access_token = response.json()['access_token']
 
@@ -101,9 +101,9 @@ class GooglePlus:
 				- A dictionary contains user information.
 		'''
 		USER_INFO_API = 'https://www.googleapis.com/oauth2/v2/userinfo'
-		params = urllib.urlencode({'access_token' : self.access_token})
+		params = urllib.parse.urlencode({'access_token' : self.access_token})
 		response = requests.get(USER_INFO_API + '?' + params)
 		if response.status_code != 200:
-			raise(Exception('Invalid response, response code {c}'.format(c=response.status_code)))
+			raise Exception
 
 		return response.json()

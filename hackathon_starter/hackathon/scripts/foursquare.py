@@ -1,7 +1,6 @@
 import simplejson as json
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import requests
-
 
 ############################
 # FOURSQUARE API CONSTANTS #
@@ -29,8 +28,6 @@ class FoursquareOauthClient(object):
         self.client_id = client_id
         self.client_secret = client_secret
 
-
-
     def get_authorize_url(self):
         '''
 		Obtains authorize url link with given client_id.
@@ -44,11 +41,9 @@ class FoursquareOauthClient(object):
                         'response_type': 'code',
                         'redirect_uri': REDIRECT_URL}
 
-        params = urllib.urlencode(authSettings)
+        params = urllib.parse.urlencode(authSettings)
 
         return AUTHORIZE_URL + '?' + params
-
-
 
     def get_access_token(self, code):
         '''
@@ -66,14 +61,13 @@ class FoursquareOauthClient(object):
                         'redirect_uri': REDIRECT_URL,
                         'code': code}
 
-        params = urllib.urlencode(authSettings)
+        params = urllib.parse.urlencode(authSettings)
         response = requests.get(ACCESS_TOKEN_URL + '?' + params)
 
         if response.status_code != 200:
-			raise(Exception('Invalid response,response code: {c}'.format(c=response.status_code)))
+            raise Exception
 
         self.access_token = response.json()['access_token']
-
 
     def get_user_info(self, api_version='20140806'):
         '''
@@ -89,14 +83,14 @@ class FoursquareOauthClient(object):
 		'''
         USER_INFO_API_URL = 'https://api.foursquare.com/v2/users/self'
 
-        authSettings={'v':api_version,
-                      'oauth_token': self.access_token}
+        authSettings = {'v': api_version,
+                        'oauth_token': self.access_token}
 
-        params = urllib.urlencode(authSettings)
+        params = urllib.parse.urlencode(authSettings)
 
         response = requests.get(USER_INFO_API_URL + '?' + params)
 
         if response.status_code != 200:
-			raise(Exception('Invalid response,response code: {c}'.format(c=response.status_code)))
+            raise Exception
 
         return response.json()['response']['user']

@@ -9,7 +9,7 @@ def fetcharticle(apikey, url):
     popular articles by view from the past 24 hours.'''
     parameters = {'api-key' : apikey}
     req = requests.get(url, params=parameters)
-    data = json.loads(req.content)
+    data = json.loads(req.content.decode('utf-8'))
     parsedData = []
     for datum in data['results']:
         newData = {

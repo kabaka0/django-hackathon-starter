@@ -8,7 +8,7 @@ def fetchData(apikey, url):
     '''Returns JSON data of the Dow Jones Average.'''
     parameters = {'rows' : 1, 'column' : 1, 'auth_token' : apikey}
     req = requests.get(url, params=parameters)
-    data = json.loads(req.content)
+    data = json.loads(req.content.decode('utf-8'))
     parsedData = []
     stockData = {}
     if data['code'] == 'COMP':
@@ -30,7 +30,7 @@ def fetchstockData(apikey, url):
     '''Returns Stock related JSON data of the stock url placed there.'''
     parameters = {'rows' : 1, 'auth_token' : apikey}
     req = requests.get(url, params=parameters)
-    data = json.loads(req.content)
+    data = json.loads(req.content.decode('utf-8'))
     parsedData = []
     stockData = {}
     stockData['name'] = data['name']
@@ -46,7 +46,7 @@ def rdiffData(apikey, url):
     '''Returns data of the difference of the stock URL placed there.'''
     parameters = {'rows' : 1, 'column' : 1, 'transformation': 'rdiff', 'auth_token' : apikey}
     req = requests.get(url, params=parameters)
-    data = json.loads(req.content)
+    data = json.loads(req.content.decode('utf-8'))
     parsedData = []
     stockData = {}
     stockData['rdiff'] = data['data'][0][1]

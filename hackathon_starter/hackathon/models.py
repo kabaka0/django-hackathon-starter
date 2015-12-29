@@ -16,7 +16,7 @@ class Profile(models.Model):
     oauth_secret = models.CharField(max_length=200)
 
     def __unicode__(self):
-        return unicode(self.user)
+        return str(self.user)
 
 class GithubProfile(models.Model):
     user = models.ForeignKey(User)
@@ -25,7 +25,7 @@ class GithubProfile(models.Model):
     scopes = models.CharField(max_length=200)
 
     def __unicode__(self):
-        return unicode(self.user)
+        return str(self.user)
 
 class TumblrProfile(models.Model):
     user = models.ForeignKey(User)
@@ -34,7 +34,7 @@ class TumblrProfile(models.Model):
     access_token_secret = models.CharField(max_length=200)
 
     def __unicode__(self):
-        return unicode(self.user)
+        return str(self.user)
 
 class InstagramProfile(models.Model):
     user = models.ForeignKey(User)
@@ -42,7 +42,7 @@ class InstagramProfile(models.Model):
     access_token = models.CharField(max_length=200)
 
     def __unicode__(self):
-        return unicode(self.user)
+        return str(self.user)
 
 class TwitterProfile(models.Model):
     user = models.ForeignKey(User)
@@ -51,7 +51,7 @@ class TwitterProfile(models.Model):
     oauth_token_secret = models.CharField(max_length=200)
 
     def __unicode__(self):
-        return unicode(self.user)
+        return str(self.user)
 
 class LinkedinProfile(models.Model):
     user = models.ForeignKey(User)
@@ -59,7 +59,7 @@ class LinkedinProfile(models.Model):
     access_token = models.CharField(max_length=200)
 
     def __unicode__(self):
-        return unicode(self.user)
+        return str(self.user)
 
 class Snippet(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -75,7 +75,7 @@ class MeetupToken(models.Model):
     access_token = models.CharField(max_length=200)
 
     def __unicode__(self):
-        return unicode(self.access_token)
+        return str(self.access_token)
 
 class FacebookProfile(models.Model):
     user = models.ForeignKey(User)

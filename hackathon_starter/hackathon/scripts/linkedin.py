@@ -2,7 +2,7 @@
 
 import simplejson as json
 import requests
-import urlparse, urllib
+import urllib.parse, urllib.request, urllib.parse, urllib.error
 
 AUTHORIZATION_URL = 'https://www.linkedin.com/uas/oauth2/authorization'
 ACCESS_TOKEN_URL = 'https://www.linkedin.com/uas/oauth2/accessToken'
@@ -23,7 +23,7 @@ class LinkedinOauthClient(object):
                         'state' : 'DCEeFWf45A53sdfKef424',
                         'scope': 'r_basicprofile'}
 
-        params = urllib.urlencode(auth_setting)
+        params = urllib.parse.urlencode(auth_setting)
         authURL = AUTHORIZATION_URL + '?' + params
         return authURL
 
@@ -35,7 +35,7 @@ class LinkedinOauthClient(object):
                     'client_secret': self.client_secret}
 
         header = {'content-type' : 'application/x-www-form-urlencoded'}
-        params = urllib.urlencode(settings)
+        params = urllib.parse.urlencode(settings)
         link = ACCESS_TOKEN_URL + '?' + params
         req = requests.post(link)#, headers=header)
 
@@ -58,5 +58,5 @@ class LinkedinOauthClient(object):
             raise Exception('Invalid response %s' %req.status_code)
 
         self.user_id = content['id']
-        print content
+        print (content)
         return content

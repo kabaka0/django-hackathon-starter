@@ -1,5 +1,5 @@
 import requests
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import simplejson as json
 
 ##########################
@@ -43,7 +43,7 @@ class FacebookOauthClient(object):
 		'''
 		authSettings = {'redirect_uri': "http://localhost:8000/hackathon/",
 		                'client_id': self.client_id}
-		params = urllib.urlencode(authSettings)
+		params = urllib.parse.urlencode(authSettings)
 		return AUTHORIZE_URL + '?' + params
 
 
@@ -61,11 +61,11 @@ class FacebookOauthClient(object):
 		                'redirect_uri': "http://localhost:8000/hackathon/",
 		                'client_secret': self.client_secret,
 		                'client_id': self.client_id}
-		params = urllib.urlencode(authSettings)
+		params = urllib.parse.urlencode(authSettings)
 		response = requests.get(ACCESS_TOKEN_URL + '?' + params)
 
 		if response.status_code != 200:
-			raise(Exception('Invalid response,response code: {c}'.format(c=response.status_code)))
+			raise Exception
 
 		response_array = str(response.text).split('&')
 		self.access_token = str(response_array[0][13:])
@@ -82,7 +82,7 @@ class FacebookOauthClient(object):
 		'''
 		response = requests.get("https://graph.facebook.com/me?access_token={at}".format(at=self.access_token))
 		if response.status_code != 200:
-			raise(Exception('Invalid response,response code: {c}'.format(c=response.status_code)))
+			raise Exception
 
 		return response.json()
 
@@ -124,7 +124,7 @@ class FacebookOauthClient(object):
 		permDict = {'status': 'granted', 'permission':perm}
 		response = requests.get(API_URL + 'me/permissions?access_token={at}'.format(at=self.access_token))
 		if response.status_code != 200:
-			raise(Exception('Invalid response,response code: {c}'.format(c=response.status_code)))
+			raise Exception
 
 		currentPermissions = response.json()['data']
 		if permDict in currentPermissions:
@@ -148,6 +148,6 @@ class FacebookOauthClient(object):
 		                'auth_type' : 'rerequest', 
 		                'scope' : perm,
 		                'access_token' : access_token}
-		params = urllib.urlencode(authSettings)
+		params = urllib.parse.urlencode(authSettings)
 		self.permission_request_url = REQUEST_PERMISSIONS_URL + '?' + params
 		

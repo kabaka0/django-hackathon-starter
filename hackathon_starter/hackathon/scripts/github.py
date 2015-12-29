@@ -5,7 +5,7 @@ with Github data and returning the responses as JSON.
 
 import requests
 import simplejson as json
-import urllib, urlparse
+import urllib.request, urllib.parse, urllib.error, urllib.parse
 
 ########################
 # GITHUB API CONSTANTS #
@@ -48,7 +48,7 @@ class GithubOauthClient(object):
         authSetting = {'client_id': self.client_id,
                        'redirect_uri': 'http://127.0.0.1:8000/hackathon/',
                        'scope': 'user, public_repo, repo, repo_deployment, notifications, gist'}
-        params = urllib.urlencode(authSetting)
+        params = urllib.parse.urlencode(authSetting)
         authURL = AUTHORIZE_URL + '?' + params
 
         return authURL
@@ -68,14 +68,14 @@ class GithubOauthClient(object):
                     'code': code,
                     'redirect_uri': 'http://127.0.0.1:8000/hackathon/',
                     'accept': 'json'}
-        params = urllib.urlencode(settings)
+        params = urllib.parse.urlencode(settings)
         accessLink = ACCESS_TOKEN_URL + '?' + params
         req = requests.get(accessLink)
 
         if int(req.status_code) != 200:
             raise Exception('Invalid response %s' %req.status_code)
 
-        content = urlparse.parse_qs(req.content)
+        content = urllib.parse.parse_qs(req.content)
         self.access_token = content['access_token'][0]
         self.token_type = content['token_type'][0]
         self.scopes = content['scope'][0]
@@ -95,7 +95,7 @@ class GithubOauthClient(object):
         if int(req.status_code) != 200:
             raise Exception('Invalid response %s' %req.status_code)
 
-        content = json.loads(req.content)
+        content = json.loads(req.content.decode('utf-8'))
         self.username = content['login']
         return content
 
@@ -134,10 +134,10 @@ def getUserData(user, clientID, clientSecret):
                     - Number of users being followed
     '''
     url = API_BASE_URL + user +  '?' + clientID + '&' + clientSecret
-    print url
+    print (url)
     req = requests.get(url)
     jsonList = []
-    jsonList.append(json.loads(req.content))
+    jsonList.append(json.loads(req.content.decode('utf-8')))
     parsedData = []
     userData = {}
     for data in jsonList:
@@ -178,10 +178,10 @@ def getUserRepositories(user, clientID, clientSecret):
     while True:
         req = requests.get('https://api.github.com/users/' + user + '/repos?page=' \
             + str(pageNumber) + '&' + clientID + '&' + clientSecret)
-        jsonList.append(json.loads(req.content))
-        if len(json.loads(req.content)) < 30:
+        jsonList.append(json.loads(req.content.decode('utf-8')))
+        if len(json.loads(req.content.decode('utf-8'))) < 30:
             break
-        elif len(json.loads(req.content)) >= 30:
+        elif len(json.loads(req.content.decode('utf-8'))) >= 30:
             pageNumber += 1
     for data in jsonList:
         for datum in data:
@@ -213,10 +213,10 @@ def getForkedRepositories(user, clientID, clientSecret):
     while True:
         req = requests.get('https://api.github.com/users/' + user + '/repos?page=' \
             + str(pageNumber) + '&' + clientID + '&' + clientSecret)
-        jsonList.append(json.loads(req.content))
-        if len(json.loads(req.content)) < 30:
+        jsonList.append(json.loads(req.content.decode('utf-8')))
+        if len(json.loads(req.content.decode('utf-8'))) < 30:
             break
-        elif len(json.loads(req.content)) >= 30:
+        elif len(json.loads(req.content.decode('utf-8'))) >= 30:
             pageNumber += 1
 
 
@@ -257,7 +257,7 @@ def getTopContributedRepositories(user, repos, clientID, clientSecret):
     for repo in repos:
         req = requests.get('https://api.github.com/repos/' + user + '/' + repo \
             + '/stats/contributors' + '?' + clientID + '&' + clientSecret)
-        jsonList.append(json.loads(req.content))
+        jsonList.append(json.loads(req.content.decode('utf-8')))
 
     parsedData = []
 
@@ -326,10 +326,10 @@ def getStarGazerCount(user, clientID, clientSecret):
     while True:
         req = requests.get('https://api.github.com/users/' + user + '/repos?page=' \
             + str(pageNumber) + '&' + clientID + '&' + clientSecret)
-        jsonList.append(json.loads(req.content))
-        if len(json.loads(req.content)) < 30:
+        jsonList.append(json.loads(req.content.decode('utf-8')))
+        if len(json.loads(req.content.decode('utf-8'))) < 30:
             break
-        elif len(json.loads(req.content)) >= 30:
+        elif len(json.loads(req.content.decode('utf-8'))) >= 30:
             pageNumber += 1
 
 

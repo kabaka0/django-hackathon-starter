@@ -1,5 +1,5 @@
 import simplejson as json
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import requests
 import string
 import pdb
@@ -26,7 +26,7 @@ class DropboxOauthClient(object):
 		                'redirect_uri': 'http://localhost:8000/hackathon',
 		                'state': self.session_id}
 
-		params = urllib.urlencode(authSettings)
+		params = urllib.parse.urlencode(authSettings)
 
 		return AUTHORIZE_URL + '?' + params
 
@@ -36,7 +36,7 @@ class DropboxOauthClient(object):
 
 	def get_access_token(self, code, state):
 		if state != self.session_id:
-			raise(Exception('Danger! Someone is messing up with you connection!'))
+			raise Exception
 
 		authSettings = {'code': code,
 		                'grant_type': 'authorization_code',
@@ -47,14 +47,14 @@ class DropboxOauthClient(object):
 		response = requests.post(ACCESS_TOKEN_URL, data=authSettings)
 
 		if response.status_code!=200:
-			raise(Exception('Invalid response, response code {c}'.format(c=response.status_code)))
+			raise Exception
 		self.access_token = response.json()['access_token']
 
 
 	def get_user_info(self):
 		USER_INFO_API = 'https://api.dropbox.com/1/account/info'
-		params = urllib.urlencode({'access_token': self.access_token})
+		params = urllib.parse.urlencode({'access_token': self.access_token})
 		response = requests.get(USER_INFO_API + '?' + params)
 		if response.status_code!=200:
-			raise(Exception('Invalid response, response code {c}'.format(c=response.status_code)))
+			raise Exception
 		return response.json()

@@ -13,7 +13,7 @@ import simplejson as json
 import time
 import re
 from bs4 import BeautifulSoup
-import urlparse
+import urllib.parse
 import oauth2
 
 request_token_url = 'http://www.tumblr.com/oauth/request_token'
@@ -48,7 +48,8 @@ class TumblrOauthClient(object):
         resp, content = client.request(request_token_url, "GET")
         #parse content
         if not self.oauth_token:
-            request_token = dict(urlparse.parse_qsl(content))
+            request_token = dict(urllib.parse.parse_qsl(content.decode('utf-8')))
+            print(request_token)
             self.oauth_token = request_token['oauth_token']
             self.oauth_token_secret = request_token['oauth_token_secret']
         link = authorize_url + "?oauth_token=" + self.oauth_token + \
@@ -63,11 +64,11 @@ class TumblrOauthClient(object):
         self.is_authorized = True
         token = oauth2.Token(self.oauth_token, self.oauth_token_secret)
         self.oauth_verifier = oauth_verifier
-        print self.oauth_verifier
+        print((self.oauth_verifier))
         token.set_verifier(self.oauth_verifier)
         client = oauth2.Client(self.consumer, token)
         resp, content = client.request(access_token_url, "POST")
-        self.access_token = dict(urlparse.parse_qsl(content))
+        self.access_token = dict(urllib.parse.parse_qsl(content.decode('utf-8')))
         #set verified token
         self.token = oauth2.Token(self.access_token['oauth_token'], self.access_token['oauth_token_secret'])
 
@@ -80,7 +81,7 @@ class TumblrOauthClient(object):
             raise Exception("Invalid response %s." % resp['status'])
 
         #return content in json format
-        jsonlist = json.loads(content)
+        jsonlist = json.loads(content.decode('utf-8'))
         response = jsonlist['response']
         self.username = str(response['user']['name'])
         user_info = response['user']
@@ -93,7 +94,7 @@ class TumblrOauthClient(object):
         ''' Returns blogger's blog information '''
         blog_info = blog_uri + user + ".tumblr.com/info?api_key="+self.consumer_key
         req = requests.get(blog_info)
-        jsonlist = json.loads(req.content)
+        jsonlist = json.loads(req.content.decode('utf-8'))
         response = jsonlist['response']
         blog = response['blog']
         blog['updated'] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(blog['updated']))
@@ -106,7 +107,7 @@ class TumblrOauthClient(object):
         tagged_uri = "http://api.tumblr.com/v2/tagged?tag=" + tag + "&api_key=" + \
             self.consumer_key + "&limit=20"
         req = requests.get(tagged_uri)
-        jsonlist = json.loads(req.content)
+        jsonlist = json.loads(req.content.decode('utf-8'))
         tags = []
         body = jsonlist['response']
         for blog in body:
@@ -127,7 +128,7 @@ class TumblrOauthClient(object):
         tagged_uri = "http://api.tumblr.com/v2/tagged?tag=" + tag + "&api_key=" + \
             self.consumer_key + "&limit=20"
         req = requests.get(tagged_uri)
-        jsonlist = json.loads(req.content)
+        jsonlist = json.loads(req.content.decode('utf-8'))
         body = jsonlist['response']
 
         tagtext = []

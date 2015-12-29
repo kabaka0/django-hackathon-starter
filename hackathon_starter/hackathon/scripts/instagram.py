@@ -4,8 +4,8 @@ with Instagram data and returning the responses as JSON.
 '''
 
 import requests
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import json
 import simplejson as json2
 import googlemaps
@@ -69,10 +69,10 @@ class InstagramOauthClient(object):
             'redirect_uri' : 'http://127.0.0.1:8000/hackathon/',
             'code' : code}
 
-        authSettingUrl = urllib.urlencode(authSetting)
-        req = urllib2.Request(ACCESS_TOKEN_URL, authSettingUrl)
-        content = urllib2.urlopen(req)
-        jsonlist = json.load(content)
+        authSettingUrl = urllib.parse.urlencode(authSetting)
+        req = urllib.request.Request(ACCESS_TOKEN_URL, authSettingUrl)
+        content = urllib.request.urlopen(req)
+        jsonlist = json.load(content.decode('utf-8'))
         self.access_token = jsonlist['access_token']
         self.user_data = jsonlist['user']
         self.is_authorized = True
@@ -121,13 +121,13 @@ def getTaggedMedia(tag, accessToken):
     tagUri = 'https://api.instagram.com/v1/tags/'
     taggedMediaUrl = tagUri + tag + '/media/recent?access_token=' + accessToken
     req = requests.get(taggedMediaUrl)
-    content = json2.loads(req.content)
+    content = json2.loads(req.content.decode('utf-8'))
     data = content['data']
 
     while len(data) <= 100:
         nextUrl = content['pagination']['next_url']
         req = requests.get(nextUrl)
-        content = json2.loads(req.content)
+        content = json2.loads(req.content.decode('utf-8'))
         for i in content['data']:
             data.append(i)
     #print len(data)
@@ -150,7 +150,7 @@ def getUserInfo(accessToken):
 
     userInfo = 'https://api.instagram.com/v1/users/32833691/?access_token='+accessToken
     req = requests.get(userInfo)
-    content = json2.loads(req.content)
+    content = json2.loads(req.content.decode('utf-8'))
     data = content['data']
     return data
 
@@ -172,7 +172,7 @@ def getUserMedia(userId, accessToken):
     userMediaUri = 'https://api.instagram.com/v1/users/' + str(userId)
     userMedia = userMediaUri + '/media/recent/?access_token=' + accessToken
     req = requests.get(userMedia)
-    content = json2.loads(req.content)
+    content = json2.loads(req.content.decode('utf-8'))
     data = content['data']
     return data
 
@@ -194,7 +194,7 @@ def searchLocationIds(lat, lng, accessToken):
     locIdUri = 'https://api.instagram.com/v1/locations/search?lat=' + str(lat)
     location = locIdUri+'&lng='+str(lng)+'&access_token='+ accessToken+'&distance=5000'
     req = requests.get(location)
-    data = json2.loads(req.content)
+    data = json2.loads(req.content.decode('utf-8'))
     listOfIds = []
     if data['meta']['code'] != 200:
         raise Exception("Invalid response %s." % data['meta']['code'])
@@ -232,7 +232,7 @@ def searchLocationMedia(listOfLocationIds, accessToken):
             tempMedia = []
             nextUrl = contentAll['pagination']['next_url']
             req = requests.get(nextUrl)
-            content = json2.loads(req.content)
+            content = json2.loads(req.content.decode('utf-8'))
             for i in content['data']:
                 i['created_time'] = datetime.fromtimestamp(int(i['created_time']))
                 i['created_time'] = i['created_time'].strftime('%Y-%m-%d %H:%M:%S')

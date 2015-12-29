@@ -8,11 +8,11 @@ with Twitter data and returning the responses as JSON.
 '''
 
 
-import urlparse
+import urllib.parse
 import oauth2 as oauth
 import requests
 import base64, random
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import binascii
 import time, collections, hmac, hashlib
 import simplejson as json2
@@ -70,7 +70,7 @@ class TwitterOauthClient(object):
         #if int(resp['status']) != 200:
         #    raise Exception('Invalid response %s' %resp['status'])
 
-        requestToken = dict(urlparse.parse_qsl(content))
+        requestToken = dict(urllib.parse.parse_qsl(content))
 
         #temporary
         self.oauth_token = requestToken['oauth_token']
@@ -107,7 +107,7 @@ class TwitterOauthClient(object):
             raise Exception('Invalid response %s' %resp['status'])
 
         #print content
-        accessToken = dict(urlparse.parse_qsl(content))
+        accessToken = dict(urllib.parse.parse_qsl(content))
 
         #permanent
         self.oauth_token = accessToken['oauth_token']
@@ -140,7 +140,7 @@ class TwitterOauthClient(object):
 
         headers = {'Authorization': createAuthHeader(oauthParameters)}
 
-        link += '?' + urllib.urlencode(linkParameters)
+        link += '?' + urllib.parse.urlencode(linkParameters)
 
         req = requests.get(link, headers=headers)
 
@@ -189,7 +189,7 @@ class TwitterOauthClient(object):
         headers = {'Authorization': createAuthHeader(oauthParameters)}
 
         if linkParameters:
-            link += '?'+urllib.urlencode(linkParameters)
+            link += '?'+urllib.parse.urlencode(linkParameters)
 
         req = requests.get(link, headers=headers)
         #print req.status_code
@@ -223,7 +223,7 @@ def percentEncode(string):
     '''
     Percent encode strings.
     '''
-    return urllib.quote(string, safe='~')
+    return urllib.parse.quote(string, safe='~')
 
 
 def getNonce():
@@ -242,9 +242,9 @@ def generateSignature(method, link, linkParameters, oauthParameters,
 
     if linkParameters:
         newDict = dict(oauthParameters, **linkParameters)
-        params = urllib.urlencode(collections.OrderedDict(sorted(newDict.items())))
+        params = urllib.parse.urlencode(collections.OrderedDict(sorted(newDict.items())))
     else:
-        params = urllib.urlencode(collections.OrderedDict(sorted(oauthParameters.items())))
+        params = urllib.parse.urlencode(collections.OrderedDict(sorted(oauthParameters.items())))
 
     #Create your Signature Base String
     signatureBaseString = (method.upper()+'&'+percentEncode(str(link))+'&'+percentEncode(params))
@@ -283,7 +283,7 @@ def createAuthHeader(parameters):
     '''
 
     orderedParameters = collections.OrderedDict(sorted(parameters.items()))
-    authHeader = ('%s="%s"' % (k, v) for k, v in orderedParameters.iteritems())
+    authHeader = ('%s="%s"' % (k, v) for k, v in orderedParameters.items())
 
     return "OAuth " + ', '.join(authHeader)
 

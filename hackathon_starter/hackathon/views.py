@@ -14,23 +14,24 @@ from django.http import JsonResponse
 # Django REST Framework
 from rest_framework import viewsets, mixins
 
+
 # Scripts
-from scripts.steam import gamespulling, steamidpulling
-from scripts.github import *
-from scripts.tumblr import TumblrOauthClient
-from scripts.twilioapi import *
-from scripts.instagram import *
-from scripts.scraper import steamDiscounts
-from scripts.quandl import *
-from scripts.twitter import TwitterOauthClient
-from scripts.nytimes import *
-from scripts.meetup import *
-from scripts.linkedin import LinkedinOauthClient
-from scripts.yelp import requestData
-from scripts.facebook import *
-from scripts.googlePlus import *
-from scripts.dropbox import *
-from scripts.foursquare import *
+from .scripts.steam import gamespulling, steamidpulling
+from .scripts.github import *
+from .scripts.tumblr import TumblrOauthClient
+from .scripts.twilioapi import *
+from .scripts.instagram import *
+from .scripts.scraper import steamDiscounts
+from .scripts.quandl import *
+from .scripts.twitter import TwitterOauthClient
+from .scripts.nytimes import *
+from .scripts.meetup import *
+from .scripts.linkedin import LinkedinOauthClient
+from .scripts.yelp import requestData
+from .scripts.facebook import *
+from .scripts.googlePlus import *
+from .scripts.dropbox import *
+from .scripts.foursquare import *
 
 # Python
 import oauth2 as oauth
@@ -55,15 +56,15 @@ getDropbox = DropboxOauthClient(settings.DROPBOX_APP_ID, settings.DROPBOX_APP_SE
 getFoursquare = FoursquareOauthClient(settings.FOURSQUARE_APP_ID, settings.FOURSQUARE_APP_SECRET)
 
 def index(request):
-    print "index: " + str(request.user)
+    print(("index: " + str(request.user)))
 
     if not request.user.is_active:
-        if request.GET.items():
+        if list(request.GET.items()):
             if profile_track == 'github':
                 code = request.GET['code']
                 getGithub.get_access_token(code)
                 getGithub.getUserInfo()
-                print getGithub.access_token
+                print((getGithub.access_token))
                 try:
                     user = User.objects.get(username = getGithub.username + '_github')
                 except User.DoesNotExist:
@@ -254,7 +255,7 @@ def index(request):
 
 
     else:
-        if request.GET.items():
+        if list(request.GET.items()):
             user = User.objects.get(username = request.user.username)
             if profile_track == 'github':
                 code = request.GET['code']
@@ -370,7 +371,7 @@ def dropboxSearchFile(request):
         response = requests.post(SEARCH_FILE_URL, data=requestParams)
 
         if response.status_code!=200:
-            raise(Exception('Invalid response, response code {c}'.format(c=response.status_code)))
+            raise Exception
 
         return render(request, 'hackathon/dropboxSearchFile.html', {'data': response.json()})
 
@@ -435,7 +436,7 @@ def meetupUser(request):
 def quandlDowJones(request):
     '''Returns JSON response about the latest dowjones index.'''
     dowjonesdata = fetchData(settings.QUANDLAPIKEY, 'https://www.quandl.com/api/v1/datasets/BCB/UDJIAD1.json?')
-    print dowjonesdata
+    print(dowjonesdata)
     return JsonResponse({'data': dowjonesdata})
 
 def quandlSnp500(request):
@@ -495,12 +496,12 @@ def quandlstocks(request):
 def nytimespop(request):
     '''Returns JSON response about the most viewed articles for the last 24 hours.'''
     popdata = fetcharticle(settings.POPAPIKEY, 'http://api.nytimes.com/svc/mostpopular/v2/mostviewed/all-sections/1.json?')
-    return JSONResponse({'data': popdata})
+    return JsonResponse({'data': popdata})
 
 def nytimestop(request):
     '''Returns JSON response about the articles located in the homepage'''
     topdata = fetcharticle(settings.TOPAPIKEY, 'http://api.nytimes.com/svc/topstories/v1/home.json?')
-    return JSONResponse({'data': topdata})
+    return JsonResponse({'data': topdata})
 
 def nytimesarticles(request):
     everyData = {}
@@ -532,7 +533,7 @@ def githubTopRepositories(request):
         list = getTopContributedRepositories(user, repositories, settings.GITHUB_CLIENT_ID, settings.GITHUB_CLIENT_SECRET)
         filtered = filterCommits(list)
         parsedData['committed'] = filtered
-        print parsedData
+        print (parsedData)
     return render(request, 'hackathon/githubTopRepositories.html', {'data': parsedData})
 
 def githubResume(request):
@@ -582,11 +583,11 @@ def tumblr(request):
 ####################
 
 def instagram(request):
-    print getInstagram.is_authorized
+    print((getInstagram.is_authorized))
 
     if getInstagram.is_authorized:
         if request.method == 'GET':
-            if request.GET.items():
+            if list(request.GET.items()):
                 instagram_tag = request.GET.get('instagram_tag')
                 instagramUser = InstagramProfile.objects.get(user = request.user)
                 tagged_media = getTaggedMedia(instagram_tag, instagramUser.access_token)
@@ -616,9 +617,9 @@ def instagramUserMedia(request):
     return JsonResponse({'data': parsedData })
 
 def instagramMediaByLocation(request):
-    print request.user
+    print((request.user))
     if request.method == 'GET':
-        if request.GET.items():
+        if list(request.GET.items()):
             #check if user has a User profile
             if request.user in User.objects.all():
                 #check if user has an Instagram profile
@@ -660,10 +661,10 @@ def twitter(request):
     return render(request, 'hackathon/twitter.html', context)
 
 def twitterTweets(request):
-    print getTwitter.is_authorized
+    print((getTwitter.is_authorized))
     if getTwitter.is_authorized:
         if request.method == 'GET':
-            if request.GET.items():
+            if list(request.GET.items()):
                 tweets = request.GET.get('tweets')
                 content, jsonlist = getTwitter.get_tweets(tweets)
             else:
@@ -740,7 +741,7 @@ def register(request):
             user.save()
             registered = True
         else:
-            print user_form.errors
+            print((user_form.errors))
     else:
         user_form = UserForm()
 
@@ -763,7 +764,7 @@ def user_login(request):
             else:
                 return HttpResponse("Your Django Hackathon account is disabled.")
         else:
-            print "Invalid login details: {0}, {1}".format(username, password)
+            print(("Invalid login details: {0}, {1}".format(username, password)))
             return HttpResponse("Invalid login details supplied.")
 
     else:
